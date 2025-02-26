@@ -2,6 +2,20 @@
 This example code creates a 2d list (2d matrix) that can store seating.
 The matrix is populated with . since all seats are available
 """
+
+import json
+import string
+
+# relative path
+pathToFile = "./src/OutdoorParkConcert.json"
+
+# try to open a file and throw a error if it is not found
+try:
+    jsonFile = open(pathToFile, 'w')
+except OSError:
+    print("ERROR: Unable to open the file %s" % pathToFile)
+
+
 FrontSeat = 0,1,2,3,4
 MiddleSeat = 5,6,7,8,9,10
 BackSeat = 11,12,13,14,15,16,17,18,19,20
@@ -27,20 +41,23 @@ def  PurchaseSeat ():
 
 def CalulateFees (SeatType, SeatCount):
 
-    FrontSeatPrice = 80
-    MiddleSeatPrice = 50
-    BackSeatPrice = 25
 
     MaskFee = 5
     TaxRate = 0.0725
-
+    
+    
+    """ 
+    FrontSeatPrice = 80
+    MiddleSeatPrice = 50
+    BackSeatPrice = 25
+    
     match SeatType:
         case "Front":
             SeatPrice = FrontSeatPrice
         case "Middle":
             SeatPrice = MiddleSeatPrice
         case "Back":
-            SeatPrice = BackSeatPrice
+            SeatPrice = BackSeatPrice """
 
     TicketCost = SeatCount * SeatPrice
     TotalMaskFee = SeatCount * MaskFee
@@ -50,12 +67,43 @@ def CalulateFees (SeatType, SeatCount):
 
     return (TicketCost, TotalMaskFee, Subtotal, Tax, Total)
 
-def ViewSeating ():
+def ViewSeating (): 
 
-    # our test matrix has 4 rows and 10 columns
-    N_ROW = 10
-    N_COL = 26
 
+    FrontSeatPrice = 80
+    MiddleSeatPrice = 50
+    BackSeatPrice = 25
+
+
+
+    ROW = range(20)
+    COL = string.ascii_uppercase
+    available_seat = '.'
+    
+    Seating = {}
+    for r in ROW:
+        Seating[r] = {}
+        for c in COL:
+            Seating[r][c] = {}
+            Seating[r][c]["Availability"] = available_seat
+            Seating[r][c]["Name"] = str(r) + str(c)
+            if r <= 4:
+                Seating[r][c]["Price"] = FrontSeatPrice
+            elif r >= 5 and r <=10:
+                Seating[r][c]["Price"] = MiddleSeatPrice
+            elif r >= 11 and r <=19:
+                Seating[r][c]["Price"] = BackSeatPrice
+                
+    print (Seating)
+
+    # print available seating
+    for r in ROW:
+        print(r, end="\t")
+        for c in COL:
+            print(Seating[r][c]["Availability"], end=" ")
+        print()  
+
+    """ # our test matrix has 4 rows and 10 columns
     # available seat
     available_seat = '.'
 
@@ -72,7 +120,12 @@ def ViewSeating ():
         print(r+1, end="\t")
         for c in range(N_COL):
             print(seating[r][c], end=" ")
-        print() 
+        print()  
+"""
+
+
+    json.dump (Seating, jsonFile, indent=6)
+    jsonFile.close()
 
 
 

@@ -27,20 +27,20 @@ def  PurchaseSeat ():
 
 def CalulateFees (SeatType, SeatCount):
 
-    PriceOfFrontSeat = 80
-    PriceOfMiddleSeat = 50
-    PriceOfBackSeat = 25
+    FrontSeatPrice = 80
+    MiddleSeatPrice = 50
+    BackSeatPrice = 25
 
     MaskFee = 5
     TaxRate = 0.0725
 
     match SeatType:
         case "Front":
-            SeatPrice = PriceOfFrontSeat
+            SeatPrice = FrontSeatPrice
         case "Middle":
-            SeatPrice = PriceOfMiddleSeat
+            SeatPrice = MiddleSeatPrice
         case "Back":
-            SeatPrice = PriceOfBackSeat
+            SeatPrice = BackSeatPrice
 
     TicketCost = SeatCount * SeatPrice
     TotalMaskFee = SeatCount * MaskFee

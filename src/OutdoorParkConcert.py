@@ -10,6 +10,9 @@ import os
 
 def  PurchaseSeat():
 
+    MaskFee = 5
+    TaxRate = 0.0725
+
     seatCount = int(input ("Number of seats desired:  "))
     seatPos = input  ("Starting seat (ex. 3D):  ")
     Validate_Availability (seatCount, seatPos)
@@ -17,41 +20,59 @@ def  PurchaseSeat():
     emailAddr = input ("Enter your email address:  ")
 
     rPos = int(seatPos[:-1])
-
-    if rPos < MiddleSeatLowerBoundary:
-        SType = "Front"
-        SPrice = FrontSeatPrice
-    elif rPos < BackSeatLowerBoundary:
-        SType = "Middle"
-        SPrice = MiddleSeatPrice
-    else:
-        SType = "Back"
-        SPrice = BackSeatPrice
+    SType, SPrice = Determine_Pricing(rPos)
 
     TicketCost = seatCount * SPrice
     TotalMaskFee = seatCount * MaskFee
     Subtotal = TicketCost + TotalMaskFee
     Tax = Subtotal * TaxRate
     Total = Subtotal + Tax
-    print ("Name:  " + name)
-    print ("Email:  " + emailAddr)
-    print ("Number of seats:  " + str(seatCount))
-    print ("Seat Type:  " + SType)
-    print ("Seats:  " + seatPos)
-    print ("Ticket Cost:  " + str(TicketCost))
-    print ("Mask Fee:  " + str(TotalMaskFee))
-    print ("Subtotal:  " + str(Subtotal))
-    print ("Tax:  " + str(Tax))
-    print ("Total:  " + str(Total)) 
+
+    print ("\n=====================================================================================")
+    print ("                                       Receipt")
+    print ("=====================================================================================")
+    print ()
+
+    print (f'{"Name:":<65}' + name)
+    print (f'{"Email:":<65}' + emailAddr)
+    print (f'{"Number of seats:":<65}' + str(seatCount))
+    print (f'{"Seat Type:":<65}' + SType)
+    print (f'{"Seats:  ":<65}' + seatPos)
+    print (f'{"Ticket Cost:":<65}' + "$" + f'{TicketCost:.2f}') 
+    print (f'{"Mask Fee:":<65}' + "$" + f'{TotalMaskFee:.2f}') 
+    print (f'{"Subtotal":<65}' + "$" + f'{Subtotal:.2f}') 
+    print (f'{"Tax:":<65}' + "$" + f'{Tax:.2f}') 
+    print ("-------------------------------------------------------------------------------------")
+    print (f'{"Total:":<65}' + "$" + f'{Total:.2f}') 
+    print ("=====================================================================================\n\n")
 
 
 def Validate_Availability (seatCount, seatPos):
 
     #rPos = seatPos[:-1]
     #cPos = seatPos[-1:]
-    #print (rPos)
-    #print (cPos)
     print (str(seatCount) + " seats starting at (" + seatPos + ") are available for purchase" )
+
+
+def Determine_Pricing (r):
+
+    FrontSeatPrice = 80
+    MiddleSeatPrice = 50
+    BackSeatPrice = 25
+
+    MiddleSeatLowerBoundary = 5
+    BackSeatLowerBoundary = 11
+
+    if r < MiddleSeatLowerBoundary:
+        SType = "Front"
+        SPrice = FrontSeatPrice
+    elif r < BackSeatLowerBoundary:
+        SType = "Middle"
+        SPrice = MiddleSeatPrice
+    else:
+        SType = "Back"
+        SPrice = BackSeatPrice
+    return (SType, SPrice)
 
 
 def Open_File (pathToFile, mode):
@@ -108,15 +129,7 @@ def View_Seating (Seating):
         for c in COL:
             print(Seating[str(r)][c]["Availability"], end=" ") 
 
-        if r < MiddleSeatLowerBoundary:
-            SType = "Front"
-            SPrice = FrontSeatPrice
-        elif r < BackSeatLowerBoundary:
-            SType = "Middle"
-            SPrice = MiddleSeatPrice
-        else:
-            SType = "Back"
-            SPrice = BackSeatPrice
+        SType, SPrice = Determine_Pricing(r)
         
         print("\t" + SType + "\t\t$" + str(SPrice), end="\t")
         print()  
@@ -127,17 +140,7 @@ if __name__ == '__main__':
 
     # relative path
     pathToFile = "../misc/OutdoorParkConcert.json"
-
-    FrontSeatPrice = 80
-    MiddleSeatPrice = 50
-    BackSeatPrice = 25
-
-    MiddleSeatLowerBoundary = 5
-    BackSeatLowerBoundary = 11
-
-    MaskFee = 5
-    TaxRate = 0.0725
-
+    
     ROW = range(20)
     COL = string.ascii_uppercase
 

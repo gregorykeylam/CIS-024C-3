@@ -9,34 +9,49 @@ import os
 
 
 def  PurchaseSeat():
+
     seatCount = int(input ("Number of seats desired:  "))
-    seatType = input  ("Type of seat desired:  ")
+    seatPos = input  ("Starting seat (ex. 3D):  ")
+    Validate_Availability (seatCount, seatPos)
     name = input ("Enter your name:  ")
     emailAddr = input ("Enter your email address:  ")
-    ticketCost, maskFee, subtotal, tax, total = Calulate_Fees(seatType, seatCount)
-    print ("Name:  " + name)
-    print ("Email:  " + emailAddr)
-    print ("Number of seats:  " + str(seatCount))
-    print ("Seat Type:  " + seatType)
-    print ("Seats:  #####")
-    print ("Ticket Cost:  " + str(ticketCost))
-    print ("Mask Fee:  " + str(maskFee))
-    print ("Subtotal:  " + str(subtotal))
-    print ("Tax:  " + str(tax))
-    print ("Total:  " + str(total)) 
 
+    rPos = int(seatPos[:-1])
 
-def Calulate_Fees (seatType, seatCount):
+    if rPos < MiddleSeatLowerBoundary:
+        SType = "Front"
+        SPrice = FrontSeatPrice
+    elif rPos < BackSeatLowerBoundary:
+        SType = "Middle"
+        SPrice = MiddleSeatPrice
+    else:
+        SType = "Back"
+        SPrice = BackSeatPrice
 
-    MaskFee = 5
-    TaxRate = 0.0725
-
-    TicketCost = seatCount * SeatPrice
+    TicketCost = seatCount * SPrice
     TotalMaskFee = seatCount * MaskFee
     Subtotal = TicketCost + TotalMaskFee
     Tax = Subtotal * TaxRate
     Total = Subtotal + Tax
-    return (TicketCost, TotalMaskFee, Subtotal, Tax, Total)
+    print ("Name:  " + name)
+    print ("Email:  " + emailAddr)
+    print ("Number of seats:  " + str(seatCount))
+    print ("Seat Type:  " + SType)
+    print ("Seats:  " + seatPos)
+    print ("Ticket Cost:  " + str(TicketCost))
+    print ("Mask Fee:  " + str(TotalMaskFee))
+    print ("Subtotal:  " + str(Subtotal))
+    print ("Tax:  " + str(Tax))
+    print ("Total:  " + str(Total)) 
+
+
+def Validate_Availability (seatCount, seatPos):
+
+    #rPos = seatPos[:-1]
+    #cPos = seatPos[-1:]
+    #print (rPos)
+    #print (cPos)
+    print (str(seatCount) + " seats starting at (" + seatPos + ") are available for purchase" )
 
 
 def Open_File (pathToFile, mode):
@@ -59,20 +74,14 @@ def Initialize_Env ():
     else:
         Seating = {}
         print ()
+
         for r in ROW:
             Seating[str(r)] = {}
             for c in COL:
                 Seating[str(r)][c] = {}
                 Seating[str(r)][c]["Availability"] = available_seat
                 Seating[str(r)][c]["Name"] = str(r) + str(c)
-                """
-                if r < MiddleSeatLowerBoundary:
-                    Seating[r][c]["Price"] = FrontSeatPrice
-                elif r < BackSeatLowerBoundary:
-                    Seating[r][c]["Price"] = MiddleSeatPrice
-                else:
-                    Seating[r][c]["Price"] = BackSeatPrice
-                """   
+                
                 jsonFile = Open_File (pathToFile, "w")
                 json.dump (Seating, jsonFile, indent=6)
                 jsonFile.close()
@@ -80,13 +89,6 @@ def Initialize_Env ():
 
 
 def View_Seating (Seating): 
-
-    FrontSeatPrice = 80
-    MiddleSeatPrice = 50
-    BackSeatPrice = 25
-
-    MiddleSeatLowerBoundary = 5
-    BackSeatLowerBoundary = 11
 
     # print available seating
     print ("\n=====================================================================================")
@@ -126,6 +128,16 @@ if __name__ == '__main__':
     # relative path
     pathToFile = "../misc/OutdoorParkConcert.json"
 
+    FrontSeatPrice = 80
+    MiddleSeatPrice = 50
+    BackSeatPrice = 25
+
+    MiddleSeatLowerBoundary = 5
+    BackSeatLowerBoundary = 11
+
+    MaskFee = 5
+    TaxRate = 0.0725
+
     ROW = range(20)
     COL = string.ascii_uppercase
 
@@ -139,23 +151,23 @@ if __name__ == '__main__':
         print ("=====================================================================================")
         print ()
 
-        print ("[p]     Purchase seat")
-        print ("[v]     View seating")
-        print ("[s]     Search seats purchased by customer's name")
-        print ("[d]     Display all purchase made amd total income")
-        print ("[q]     Quit app")
+        print ("[P/p]     Purchase seat")
+        print ("[V/v]     View seating")
+        print ("[S/s]     Search seats purchased by customer's name")
+        print ("[D/d]     Display all purchase made amd total income")
+        print ("[Q/q]     Quit app")
         print ("\n")
         Command = input ("Enter a command:  ")
-        match Command:
+        match Command.lower():
             case "p":
                 PurchaseSeat()
             case "v":
                 View_Seating (Seating)
                 print ("\n")
             case "s":
-                print ("S has nothing yet")
+                print ("Search option has nothing yet")
             case "d":
-                print ("D has nothing yet")
+                print ("Display option has nothing yet")
             case "q":
                 exit () 
             case _:

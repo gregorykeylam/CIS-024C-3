@@ -7,19 +7,13 @@ import json
 import string
 import os
 
-# relative path
-pathToFile = "../misc/OutdoorParkConcert.json"
-
-
 
 def  PurchaseSeat():
     seatCount = int(input ("Number of seats desired:  "))
     seatType = input  ("Type of seat desired:  ")
     name = input ("Enter your name:  ")
     emailAddr = input ("Enter your email address:  ")
-
     ticketCost, maskFee, subtotal, tax, total = Calulate_Fees(seatType, seatCount)
-
     print ("Name:  " + name)
     print ("Email:  " + emailAddr)
     print ("Number of seats:  " + str(seatCount))
@@ -31,6 +25,7 @@ def  PurchaseSeat():
     print ("Tax:  " + str(tax))
     print ("Total:  " + str(total)) 
 
+
 def Calulate_Fees (seatType, seatCount):
 
     MaskFee = 5
@@ -41,7 +36,6 @@ def Calulate_Fees (seatType, seatCount):
     Subtotal = TicketCost + TotalMaskFee
     Tax = Subtotal * TaxRate
     Total = Subtotal + Tax
-
     return (TicketCost, TotalMaskFee, Subtotal, Tax, Total)
 
 
@@ -54,17 +48,9 @@ def Open_File (pathToFile, mode):
         print("ERROR: Unable to open the file %s" % pathToFile)
     return jsonFile
 
-def ViewSeating (): 
 
-    FrontSeatPrice = 80
-    MiddleSeatPrice = 50
-    BackSeatPrice = 25
-
-    MiddleSeatLowerBoundary = 5
-    BackSeatLowerBoundary = 11
-
-    ROW = range(20)
-    COL = string.ascii_uppercase
+def Initialize_Env (): 
+    
     available_seat = '.'
     
     if os.path.exists(pathToFile):
@@ -90,8 +76,17 @@ def ViewSeating ():
                 jsonFile = Open_File (pathToFile, "w")
                 json.dump (Seating, jsonFile, indent=6)
                 jsonFile.close()
+    return Seating
 
-    print (Seating)
+
+def View_Seating (Seating): 
+
+    FrontSeatPrice = 80
+    MiddleSeatPrice = 50
+    BackSeatPrice = 25
+
+    MiddleSeatLowerBoundary = 5
+    BackSeatLowerBoundary = 11
 
     # print available seating
     print ("\n=====================================================================================")
@@ -124,20 +119,39 @@ def ViewSeating ():
         print("\t" + SType + "\t\t$" + str(SPrice), end="\t")
         print()  
 
+
+
 if __name__ == '__main__':
 
+    # relative path
+    pathToFile = "../misc/OutdoorParkConcert.json"
+
+    ROW = range(20)
+    COL = string.ascii_uppercase
+
+    Seating = Initialize_Env ()
+
+
     while True:
+
+        print ("=====================================================================================")
+        print ("                              Outdoor Park Concert App")
+        print ("=====================================================================================")
+        print ()
+
         print ("[p]     Purchase seat")
         print ("[v]     View seating")
         print ("[s]     Search seats purchased by customer's name")
         print ("[d]     Display all purchase made amd total income")
         print ("[q]     Quit app")
+        print ("\n")
         Command = input ("Enter a command:  ")
         match Command:
             case "p":
                 PurchaseSeat()
             case "v":
-                ViewSeating()
+                View_Seating (Seating)
+                print ("\n")
             case "s":
                 print ("S has nothing yet")
             case "d":
@@ -145,4 +159,4 @@ if __name__ == '__main__':
             case "q":
                 exit () 
             case _:
-                print ("Invalid input.  Please try again...")
+                print ("\nInvalid input!  Please try again.")

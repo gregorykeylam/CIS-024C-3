@@ -8,7 +8,7 @@ import string
 import os
 
 # relative path
-pathToFile = "./src/OutdoorParkConcert.json"
+pathToFile = "../misc/OutdoorParkConcert.json"
 
 
 
@@ -74,11 +74,11 @@ def ViewSeating ():
         Seating = {}
         print ()
         for r in ROW:
-            Seating[r] = {}
+            Seating[str(r)] = {}
             for c in COL:
-                Seating[r][c] = {}
-                Seating[r][c]["Availability"] = available_seat
-                Seating[r][c]["Name"] = str(r) + str(c)
+                Seating[str(r)][c] = {}
+                Seating[str(r)][c]["Availability"] = available_seat
+                Seating[str(r)][c]["Name"] = str(r) + str(c)
                 """
                 if r < MiddleSeatLowerBoundary:
                     Seating[r][c]["Price"] = FrontSeatPrice
@@ -109,7 +109,6 @@ def ViewSeating ():
     for r in ROW:
         print(r, end="\t")
         for c in COL:
-            #print ("==" + str(r) + c)
             print(Seating[str(r)][c]["Availability"], end=" ") 
 
         if r < MiddleSeatLowerBoundary:
@@ -125,23 +124,25 @@ def ViewSeating ():
         print("\t" + SType + "\t\t$" + str(SPrice), end="\t")
         print()  
 
-while True:
-    print ("[p]     Purchase seat")
-    print ("[v]     View seating")
-    print ("[s]     Search seats purchased by customer's name")
-    print ("[d]     Display all purchase made amd total income")
-    print ("[q]     Quit app")
-    Command = input ("Enter a command:  ")
-    match Command:
-        case "p":
-            PurchaseSeat()
-        case "v":
-            ViewSeating()
-        case "s":
-            print ("S has nothing yet")
-        case "d":
-            print ("D has nothing yet")
-        case "q":
-            exit () 
-        case _:
-            print ("Invalid input.  Please try again...")
+if __name__ == '__main__':
+
+    while True:
+        print ("[p]     Purchase seat")
+        print ("[v]     View seating")
+        print ("[s]     Search seats purchased by customer's name")
+        print ("[d]     Display all purchase made amd total income")
+        print ("[q]     Quit app")
+        Command = input ("Enter a command:  ")
+        match Command:
+            case "p":
+                PurchaseSeat()
+            case "v":
+                ViewSeating()
+            case "s":
+                print ("S has nothing yet")
+            case "d":
+                print ("D has nothing yet")
+            case "q":
+                exit () 
+            case _:
+                print ("Invalid input.  Please try again...")

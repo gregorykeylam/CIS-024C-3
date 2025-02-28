@@ -8,16 +8,17 @@ import string
 import os
 
 
-def  PurchaseSeat():
+def  Purchase_Seat(Seating):
 
     MaskFee = 5
     TaxRate = 0.0725
 
     seatCount = int(input ("Number of seats desired:  "))
     seatPos = input  ("Starting seat (ex. 3D):  ")
-    Validate_Availability (seatCount, seatPos)
     name = input ("Enter your name:  ")
     emailAddr = input ("Enter your email address:  ")
+    
+    Update_Availability (seatCount, seatPos, name, Seating)
 
     rPos = int(seatPos[:-1])
     SType, SPrice = Determine_Pricing(rPos)
@@ -45,14 +46,18 @@ def  PurchaseSeat():
     print ("_____________________________________________________________________________________")
     print (f'{"Total:":<65}' + "$" + f'{Total:.2f}') 
     print ("=====================================================================================\n\n")
+    return Seating
 
+def Update_Availability (seatCount, seatPos, name, Seating):
 
-def Validate_Availability (seatCount, seatPos):
-
-    #rPos = seatPos[:-1]
-    #cPos = seatPos[-1:]
+    rPos = seatPos[:-1]
+    cPos = seatPos[-1:]
+    print ("rPos->" + rPos + ":" + "cPos->" + cPos)
+    Seating[rPos][cPos]["Availability"] = "x"
+    Seating[rPos][cPos]["ReservedBy"] = name
     print (str(seatCount) + " seats starting at (" + seatPos + ") are available for purchase" )
-
+    print (Seating)
+    return Seating
 
 def Determine_Pricing (r):
 
@@ -163,13 +168,15 @@ if __name__ == '__main__':
         Command = input ("Enter a command:  ")
         match Command.lower():
             case "p":
-                PurchaseSeat()
+                Purchase_Seat(Seating)
             case "v":
                 View_Seating (Seating)
                 print ("\n")
             case "s":
+                #Search_By_Customer (Seating)
                 print ("Search option has nothing yet")
             case "d":
+                #Display_All_Purchases (Seating)
                 print ("Display option has nothing yet")
             case "q":
                 exit () 

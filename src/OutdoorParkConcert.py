@@ -56,7 +56,7 @@ def Update_Availability (seatCount, seatPos, name, Seating):
     Seating[rPos][cPos]["Availability"] = "x"
     Seating[rPos][cPos]["ReservedBy"] = name
     print (str(seatCount) + " seats starting at (" + seatPos + ") are available for purchase" )
-    print (Seating)
+    #print (Seating)
     return Seating
 
 def Determine_Pricing (r):
@@ -106,11 +106,8 @@ def Initialize_Env ():
             for c in COL:
                 Seating[str(r)][c] = {}
                 Seating[str(r)][c]["Availability"] = available_seat
-                Seating[str(r)][c]["Name"] = str(r) + str(c)
+                #1Seating[str(r)][c]["Name"] = str(r) + str(c)
                 
-                jsonFile = Open_File (pathToFile, "w")
-                json.dump (Seating, jsonFile, indent=6)
-                jsonFile.close()
     return Seating
 
 
@@ -139,6 +136,35 @@ def View_Seating (Seating):
         print("\t" + SType + "\t\t$" + str(SPrice), end="\t")
         print()  
 
+
+def Search_By_Customer (Seating):
+    #print (Seating.get("2",{}))
+    #print (Seating.get("2",{}).get("D",{}))
+    #print (Seating.get("2",{}).get("D",{}).get("ReservedBy"))
+
+    SearchName = input ("Enter customer's name to be searched:  ")
+
+    print ("\n=====================================================================================")
+    print ("                                   Search Result")
+    print ("=====================================================================================")
+    print ()
+
+    Ticket = []
+    for r in ROW:
+        for c in COL:
+            if Seating[str(r)][c].get("ReservedBy") == SearchName:
+                sPos = str(r) + c
+                Ticket.append(sPos) 
+    if len(Ticket) > 0:
+        print ("\n\"" + SearchName + "\" has purchased the following seat(s):\n")
+        print (Ticket)    
+    else:
+        print ("\nNo order found for \"" + SearchName + "\"")
+    print ()
+    print ()
+
+def Display_All_Purchases (Seating):
+    print ("Display option has nothing yet")
 
 
 if __name__ == '__main__':
@@ -173,12 +199,13 @@ if __name__ == '__main__':
                 View_Seating (Seating)
                 print ("\n")
             case "s":
-                #Search_By_Customer (Seating)
-                print ("Search option has nothing yet")
+                Search_By_Customer (Seating)
             case "d":
-                #Display_All_Purchases (Seating)
-                print ("Display option has nothing yet")
+                Display_All_Purchases (Seating)
             case "q":
+                jsonFile = Open_File (pathToFile, "w")
+                json.dump (Seating, jsonFile, indent=6)
+                jsonFile.close()
                 exit () 
             case _:
                 print ("\nInvalid input!  Please try again.")

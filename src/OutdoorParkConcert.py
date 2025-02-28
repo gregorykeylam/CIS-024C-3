@@ -157,14 +157,44 @@ def Search_By_Customer (Seating):
                 Ticket.append(sPos) 
     if len(Ticket) > 0:
         print ("\n\"" + SearchName + "\" has purchased the following seat(s):\n")
-        print (Ticket)    
+        print (*Ticket)    
     else:
         print ("\nNo order found for \"" + SearchName + "\"")
     print ()
     print ()
 
+
 def Display_All_Purchases (Seating):
-    print ("Display option has nothing yet")
+    print ("\n=====================================================================================")
+    print ("                                   Purchase History")
+    print ("=====================================================================================")
+    print ()
+
+    Amount = 0
+    sType = []
+    Purchases = []
+    for r in ROW:
+        for c in COL:
+            if Seating[str(r)][c].get("ReservedBy") != None:
+                sPos = str(r) + c
+                Purchases.append(sPos) 
+                x,y = Determine_Pricing (r)
+                sType.append(x)       
+                Amount += y
+
+    print ("\nFollowning seats have been sold:\n")
+    print (*Purchases)
+    #print ("\n\"" + SearchName + "\" has purchased the following seat(s):\n")
+    print ()
+    #print (TypeCount)
+    print ("Transactions above (" + str(sType.count("Front")) + " Front, " + str(sType.count("Middle")) + \
+    " Middle & " + str(sType.count("Back")) + " Back) have generated $" + f'{Amount:.2f}' + " of income")
+    #print (sType.count("Middle"))
+    #print (sType.count("Back"))
+    #print (Amount)
+    print ()
+    print ()
+
 
 
 if __name__ == '__main__':

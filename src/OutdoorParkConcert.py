@@ -8,120 +8,6 @@ import string
 import os
 
 
-def  Purchase_Seat(Seating):
-
-    MaskFee = 5
-    TaxRate = 0.0725
-    
-    state = True
-    while state == True:
-        seatCount = input ("Number of seats desired:  ")
-        if not seatCount.isnumeric():
-            print ("\nInput is NOT an integar!!!\n")
-        else:
-            state = False
-
-    state = True
-    while state == True:    
-        seatPos = input  ("Starting seat (ex. 3D):  ")
-        rPos = int(seatPos[:-1])
-        cPos = seatPos[-1:]
-        if rPos not in ROW or cPos not in COL or ord(cPos)+int(seatCount) > 90:
-            print ("\nInput exceeds capacity!!!\n")
-        else:
-            state = False
-
-    name = input ("Enter your name:  ")
-    emailAddr = input ("Enter your email address:  ")
-    
-    Seating, Seat = Update_Availability (seatCount, seatPos, name, Seating)
-    SType, SPrice = Determine_Pricing(rPos)
-
-    TicketCost = int(seatCount) * SPrice
-    TotalMaskFee = int(seatCount) * MaskFee
-    Subtotal = TicketCost + TotalMaskFee
-    Tax = Subtotal * TaxRate
-    Total = Subtotal + Tax
-
-    print ("\n=====================================================================================")
-    print ("                                       Receipt")
-    print ("=====================================================================================")
-    print ()
-
-    print (f'{"Name:":<50}', name)
-    print (f'{"Email:":<50}', emailAddr)
-    print (f'{"Number of seats:":<50}', seatCount)
-    print (f'{"Seat Type:":<50}', SType, "($" + str(SPrice) + ")")
-    print (f'{"Seats:  ":<50}', *Seat)
-    print (f'{"Ticket Cost:":<50}', "$" + f'{TicketCost:.2f}') 
-    print (f'{"Mask Fee:":<50}', "$" + f'{TotalMaskFee:.2f}') 
-    print (f'{"Subtotal":<50}', "$" + f'{Subtotal:.2f}') 
-    print (f'{"Tax:":<50}', "$" + f'{Tax:.2f}') 
-    print ("-------------------------------------------------------------------------------------")
-    print (f'{"Total:":<50}', "$" + f'{Total:.2f}') 
-    print ("=====================================================================================\n\n")
-    return Seating
-
-def Update_Availability (seatCount, seatPos, name, Seating):
-
-    rPos = seatPos[:-1]
-    cPos = seatPos[-1:]
-   
-    Seat = []
-    for x in range(ord(cPos), ord(cPos)+int(seatCount)):
-        Seating[rPos][chr(x)]["Availability"] = "R"
-        Seating[rPos][chr(x)]["ReservedBy"] = name
-        sPos = str(rPos) + chr(x)
-        Seat.append(sPos) 
-
-    if ord(cPos)-2 < 65:
-        Left = 65
-    else:
-        Left = ord(cPos)-2
-    for y in range(Left, ord(cPos)):
-        Seating[rPos][chr(y)]["Availability"] = "x"
-    
-
-    if ord(cPos)+int(seatCount)+2 > 90:
-        Right = 90 + 1 
-    else:
-        Right = ord(cPos)+int(seatCount)+2
-    for z in range(ord(cPos)+int(seatCount), Right):
-        Seating[rPos][chr(z)]["Availability"] = "x"
-
-
-    if int(rPos)+1 < 19:
-        for i in range(Left, Right):
-            Seating[str(int(rPos)+1)][chr(i)]["Availability"] = "x"
-
-    if int(rPos)-1 > 0:
-        for j in range(Left, Right):
-            Seating[str(int(rPos)-1)][chr(j)]["Availability"] = "x"
-
-    print (str(seatCount) + " seats starting at (" + seatPos + ") are available for purchase" )
-    return (Seating, Seat)
-
-def Determine_Pricing (r):
-
-    FrontSeatPrice = 80
-    MiddleSeatPrice = 50
-    BackSeatPrice = 25
-
-    MiddleSeatLowerBoundary = 5
-    BackSeatLowerBoundary = 11
-
-    if r < MiddleSeatLowerBoundary:
-        SType = "Front"
-        SPrice = FrontSeatPrice
-    elif r < BackSeatLowerBoundary:
-        SType = "Middle"
-        SPrice = MiddleSeatPrice
-    else:
-        SType = "Back"
-        SPrice = BackSeatPrice
-    return (SType, SPrice)
-
-
 def Open_File (pathToFile, mode):
 
     # try to open a file and throw a error if it is not found
@@ -151,6 +37,85 @@ def Initialize_Env ():
                 
     return Seating
 
+def Generate_Artifact (seatCount, seatPos):
+
+    PotentialPurchase = []   
+    Distancing = []
+    
+    rPos = seatPos[:-1]
+    cPos = seatPos[-1:]
+       
+    if ord(cPos)-2 < 65:
+        Left = 65
+    else:
+        Left = ord(cPos)-2
+    for item in range(Left, ord(cPos)):
+        Distancing.append([rPos, chr(item)])
+
+    if ord(cPos)+int(seatCount)+2 > 90:
+        Right = 90 + 1 
+    else:
+        Right = ord(cPos)+int(seatCount)+2
+    for item in range(ord(cPos)+int(seatCount), Right):
+        Distancing.append([rPos, chr(item)])
+
+    if int(rPos)+1 < 19:
+        for item in range(Left, Right):
+            Distancing.append([str(int(rPos)+1), chr(item)])
+
+    if int(rPos)-1 > 0:
+        for item in range(Left, Right):
+            Distancing.append([str(int(rPos)-1), chr(item)])
+
+    for item in range(ord(cPos), ord(cPos)+int(seatCount)):
+        PotentialPurchase.append([str(rPos), chr(item)]) 
+    return (PotentialPurchase, Distancing)
+
+
+def Update_Availability (PotentialPurchase, Distancing):
+    for r, c in Distancing:   
+        Seating[r][c]["Availability"]="x"
+            
+    for r, c in PotentialPurchase:
+        Seating[r][c]["Availability"]="R" 
+            
+    return (Seating)
+
+def Check_Overlap(PotentialPurchase, Distancing):
+    
+    Reserved = []
+    for r in ROW:
+        for c in COL:
+            if Seating[str(r)][c].get("Availability") == "R":
+                Reserved.append([str(r),c]) 
+    print (Distancing + PotentialPurchase)
+    return (any (item in Reserved for item in Distancing + PotentialPurchase))
+
+def Display_All_Purchases (Seating):
+    print ("\n=====================================================================================")
+    print ("                                   Purchase History")
+    print ("=====================================================================================")
+    print ()
+
+    Amount = 0
+    sType = []
+    Purchases = []
+    for r in ROW:
+        for c in COL:
+            if Seating[str(r)][c].get("ReservedBy") != None:
+                sPos = str(r) + c
+                Purchases.append(sPos) 
+                x,y = Determine_Pricing (r)
+                sType.append(x)       
+                Amount += y
+
+    print ("\nFollowning seats have been sold:\n")
+    print (*Purchases)
+    print ()
+    print ("Transactions above (" + str(sType.count("Front")) + " Front, " + str(sType.count("Middle")) + \
+    " Middle & " + str(sType.count("Back")) + " Back) have generated $" + f'{Amount:.2f}' + " of income")
+    print ()
+    print ()
 
 def View_Seating (Seating): 
 
@@ -205,33 +170,89 @@ def Search_By_Customer (Seating):
     print ()
 
 
-def Display_All_Purchases (Seating):
-    print ("\n=====================================================================================")
-    print ("                                   Purchase History")
-    print ("=====================================================================================")
-    print ()
+def Determine_Pricing (r):
 
-    Amount = 0
-    sType = []
-    Purchases = []
-    for r in ROW:
-        for c in COL:
-            if Seating[str(r)][c].get("ReservedBy") != None:
-                sPos = str(r) + c
-                Purchases.append(sPos) 
-                x,y = Determine_Pricing (r)
-                sType.append(x)       
-                Amount += y
+    FrontSeatPrice = 80
+    MiddleSeatPrice = 50
+    BackSeatPrice = 25
 
-    print ("\nFollowning seats have been sold:\n")
-    print (*Purchases)
-    print ()
-    print ("Transactions above (" + str(sType.count("Front")) + " Front, " + str(sType.count("Middle")) + \
-    " Middle & " + str(sType.count("Back")) + " Back) have generated $" + f'{Amount:.2f}' + " of income")
-    print ()
-    print ()
+    MiddleSeatLowerBoundary = 5
+    BackSeatLowerBoundary = 11
+
+    if r < MiddleSeatLowerBoundary:
+        SType = "Front"
+        SPrice = FrontSeatPrice
+    elif r < BackSeatLowerBoundary:
+        SType = "Middle"
+        SPrice = MiddleSeatPrice
+    else:
+        SType = "Back"
+        SPrice = BackSeatPrice
+    return (SType, SPrice)
 
 
+def Purchase_Seat(Seating):           
+    
+    MaskFee = 5
+    TaxRate = 0.0725
+
+    state = True
+    while state == True:
+        seatCount = input ("Number of seats desired:  ")
+        if not seatCount.isnumeric():
+            print ("\nInput is NOT an integar!!!\n")
+        else:
+            state = False
+
+    state = True
+    while state == True:    
+        
+        seatPos = input  ("Starting seat (ex. 3D):  ")
+
+        rPos = int(seatPos[:-1])
+        cPos = seatPos[-1:]
+
+        PotentialPurchase, Distancing = Generate_Artifact (seatCount, seatPos)
+
+        if Check_Overlap (PotentialPurchase, Distancing):
+            print ("\nSeat selection NOT valid!!\n")
+        elif rPos not in ROW or cPos not in COL or ord(cPos)+int(seatCount) > 90:
+            print ("\nInput exceeds capacity!!!\n")
+        else:
+            print (str(seatCount) + " seats starting at (" + seatPos + ") are available for purchase" )
+            state = False
+
+            name = input ("Enter your name:  ")
+            emailAddr = input ("Enter your email address:  ")
+
+            Update_Availability (PotentialPurchase, Distancing)
+            SType, SPrice = Determine_Pricing(rPos)
+            Seat = [x+y for x,y in PotentialPurchase]
+            print (Seat)
+
+            TicketCost = int(seatCount) * SPrice
+            TotalMaskFee = int(seatCount) * MaskFee
+            Subtotal = TicketCost + TotalMaskFee
+            Tax = Subtotal * TaxRate
+            Total = Subtotal + Tax
+
+            print ("\n=====================================================================================")
+            print ("                                       Receipt")
+            print ("=====================================================================================")
+            print ()
+            print (f'{"Name:":<50}', name)
+            print (f'{"Email:":<50}', emailAddr)
+            print (f'{"Number of seats:":<50}', seatCount)
+            print (f'{"Seat Type:":<50}', SType, "($" + str(SPrice) + ")")
+            print (f'{"Seats:  ":<50}', *Seat)
+            print (f'{"Ticket Cost:":<50}', "$" + f'{TicketCost:.2f}') 
+            print (f'{"Mask Fee:":<50}', "$" + f'{TotalMaskFee:.2f}') 
+            print (f'{"Subtotal":<50}', "$" + f'{Subtotal:.2f}') 
+            print (f'{"Tax:":<50}', "$" + f'{Tax:.2f}') 
+            print ("-------------------------------------------------------------------------------------")
+            print (f'{"Total:":<50}', "$" + f'{Total:.2f}') 
+            print ("=====================================================================================\n\n")
+            return Seating
 
 if __name__ == '__main__':
 

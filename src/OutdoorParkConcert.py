@@ -12,8 +12,15 @@ def  Purchase_Seat(Seating):
 
     MaskFee = 5
     TaxRate = 0.0725
+    
+    state = True
+    while state == True:
+        seatCount = input ("Number of seats desired:  ")
+        if not seatCount.isnumeric():
+            print ("\nInput is NOT an integar!!!\n")
+        else:
+            state = False
 
-    seatCount = int(input ("Number of seats desired:  "))
     seatPos = input  ("Starting seat (ex. 3D):  ")
     name = input ("Enter your name:  ")
     emailAddr = input ("Enter your email address:  ")
@@ -23,8 +30,8 @@ def  Purchase_Seat(Seating):
     rPos = int(seatPos[:-1])
     SType, SPrice = Determine_Pricing(rPos)
 
-    TicketCost = seatCount * SPrice
-    TotalMaskFee = seatCount * MaskFee
+    TicketCost = int(seatCount) * SPrice
+    TotalMaskFee = int(seatCount) * MaskFee
     Subtotal = TicketCost + TotalMaskFee
     Tax = Subtotal * TaxRate
     Total = Subtotal + Tax
@@ -52,9 +59,37 @@ def Update_Availability (seatCount, seatPos, name, Seating):
 
     rPos = seatPos[:-1]
     cPos = seatPos[-1:]
-    print ("rPos->" + rPos + ":" + "cPos->" + cPos)
-    Seating[rPos][cPos]["Availability"] = "x"
-    Seating[rPos][cPos]["ReservedBy"] = name
+    #xPos = chr(ord(cPos) + int(seatCount))
+    #print (xPos)
+    #print ("rPos->" + rPos + ":" + "cPos->" + cPos)
+    #print ("rPos->", ord(cPos) ,  ":" + "xPos->" , xPos)
+   
+    for x in range(ord(cPos), ord(cPos)+int(seatCount)):
+        Seating[rPos][chr(x)]["Availability"] = "R"
+        Seating[rPos][chr(x)]["ReservedBy"] = name
+    
+    if ord(cPos)-2 < 65:
+        sp = ord(cPos)+int(seatCount)+2
+    else:
+        sp = ord(cPos)-2
+
+    for y in range(sp, ord(cPos)):
+        Seating[rPos][chr(y)]["Availability"] = "x"
+    
+    if ord(cPos)+int(seatCount)+2 > 90:
+        sp = 90 
+    else:
+        sp = ord(cPos)+int(seatCount)+2
+
+    for z in range(ord(cPos)+int(seatCount), sp):
+        Seating[rPos][chr(z)]["Availability"] = "x"
+
+    #for i in range(ord(cPos)-2, ord(cPos)+int(seatCount)+2):
+     #   Seating[str(int(rPos)+1)][chr(i)]["Availability"] = "x"
+
+    #for j in range(ord(cPos)-2, ord(cPos)+int(seatCount)+2):
+    #    Seating[str(int(rPos)-1)][chr(j)]["Availability"] = "x"
+
     print (str(seatCount) + " seats starting at (" + seatPos + ") are available for purchase" )
     #print (Seating)
     return Seating

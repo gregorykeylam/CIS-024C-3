@@ -8,38 +8,68 @@ import string
 import os
 
 
-def Open_File (pathToFile, mode):
 
-    # try to open a file and throw a error if it is not found
-    try:
-        jsonFile = open(pathToFile, mode)
-    except OSError:
-        print("ERROR: Unable to open the file %s" % pathToFile)
-    return jsonFile
-
-
-def Initialize_Env (): 
+def Check_Overlap(SeatWanted, Distancing):
     
-    available_seat = '.'
-    
-    if os.path.exists(pathToFile):
-        jsonFile = Open_File (pathToFile, "r")
-        Seating = json.load(jsonFile)
+    Reserved = []
+    for r in ROW:
+        for c in COL:
+            if Seating[str(r)][c].get("Availability") == reserved_seat:
+                Reserved.append([str(r),c]) 
+    return (any (item in Reserved for item in Distancing + SeatWanted))
+
+
+def Determine_Pricing (rPos):
+
+    FrontSeatPrice = 80
+    MiddleSeatPrice = 50
+    BackSeatPrice = 25
+
+    MiddleSeatLowerBoundary = 5
+    BackSeatLowerBoundary = 11
+
+    if rPos < MiddleSeatLowerBoundary:
+        SType = "Front"
+        SPrice = FrontSeatPrice
+    elif rPos < BackSeatLowerBoundary:
+        SType = "Middle"
+        SPrice = MiddleSeatPrice
     else:
-        Seating = {}
-        print ()
+        SType = "Back"
+        SPrice = BackSeatPrice
+    return (SType, SPrice)
 
-        for r in ROW:
-            Seating[str(r)] = {}
-            for c in COL:
-                Seating[str(r)][c] = {}
-                Seating[str(r)][c]["Availability"] = available_seat
-                
-    return Seating
+
+def Display_All_Purchases (Seating):
+    print ("\n=====================================================================================")
+    print ("                                   Purchase History")
+    print ("=====================================================================================")
+    print ()
+
+    Amount = 0
+    sType = []
+    Transactions = []
+    for rPos in ROW:
+        for c in COL:
+            if Seating[str(r)][c].get("ReservedBy") != None:
+                sPos = str(r) + c
+                Transactions.append(sPos) 
+                SType, SPrice = Determine_Pricing (rPos)
+                sType.append(SType)       
+                Amount += SPrice
+
+    print ("\nFollowning seats have been sold:\n")
+    print (*Transactions)
+    print ()
+    print ("Transactions above (" + str(sType.count("Front")) + " Front, " + str(sType.count("Middle")) + \
+    " Middle & " + str(sType.count("Back")) + " Back) have generated $" + f'{Amount:.2f}' + " of income")
+    print ()
+    print ()
+
 
 def Generate_Artifact (seatCount, seatPos):
 
-    PotentialPurchase = []   
+    SeatWanted = []   
     Distancing = []
     
     rPos = seatPos[:-1]
@@ -68,78 +98,102 @@ def Generate_Artifact (seatCount, seatPos):
             Distancing.append([str(int(rPos)-1), chr(item)])
 
     for item in range(ord(cPos), ord(cPos)+int(seatCount)):
-        PotentialPurchase.append([str(rPos), chr(item)]) 
-    return (PotentialPurchase, Distancing)
+        SeatWanted.append([str(rPos), chr(item)]) 
+    return (SeatWanted, Distancing)
 
 
-def Update_Availability (PotentialPurchase, Distancing):
-    for r, c in Distancing:   
-        Seating[r][c]["Availability"]="x"
-            
-    for r, c in PotentialPurchase:
-        Seating[r][c]["Availability"]="R" 
-            
-    return (Seating)
-
-def Check_Overlap(PotentialPurchase, Distancing):
+def Initialize_Env (): 
     
-    Reserved = []
-    for r in ROW:
-        for c in COL:
-            if Seating[str(r)][c].get("Availability") == "R":
-                Reserved.append([str(r),c]) 
-    print (Distancing + PotentialPurchase)
-    return (any (item in Reserved for item in Distancing + PotentialPurchase))
-
-def Display_All_Purchases (Seating):
-    print ("\n=====================================================================================")
-    print ("                                   Purchase History")
-    print ("=====================================================================================")
-    print ()
-
-    Amount = 0
-    sType = []
-    Purchases = []
-    for r in ROW:
-        for c in COL:
-            if Seating[str(r)][c].get("ReservedBy") != None:
-                sPos = str(r) + c
-                Purchases.append(sPos) 
-                x,y = Determine_Pricing (r)
-                sType.append(x)       
-                Amount += y
-
-    print ("\nFollowning seats have been sold:\n")
-    print (*Purchases)
-    print ()
-    print ("Transactions above (" + str(sType.count("Front")) + " Front, " + str(sType.count("Middle")) + \
-    " Middle & " + str(sType.count("Back")) + " Back) have generated $" + f'{Amount:.2f}' + " of income")
-    print ()
-    print ()
-
-def View_Seating (Seating): 
-
-    # print available seating
-    print ("\n=====================================================================================")
-    print ("                                       Seating")
-    print ("=====================================================================================")
-    print ()
+    available_seat = '.'
     
-    print ("\t", end="")
-    for c in COL:
-        print (c, end=" ")
-    print ("\tType\t\tPrice")
-    print ("\t" + "-" * 52 + "\t" + "-" * 6 + "\t\t" + "-" * 5)
+    if os.path.exists(pathToFile):
+        jsonFile = Open_File (pathToFile, "r")
+        Seating = json.load(jsonFile)
+    else:
+        Seating = {}
+        print ()
 
-    for r in ROW:
-        print(r, end="\t")
-        for c in COL:
-            print(Seating[str(r)][c]["Availability"], end=" ") 
+        for r in ROW:
+            Seating[str(r)] = {}
+            for c in COL:
+                Seating[str(r)][c] = {}
+                Seating[str(r)][c]["Availability"] = available_seat
+                
+    return Seating
 
-        SType, SPrice = Determine_Pricing(r)
+
+def Open_File (pathToFile, mode):
+
+    # try to open a file and throw a error if it is not found
+    try:
+        jsonFile = open(pathToFile, mode)
+    except OSError:
+        print("ERROR: Unable to open the file %s" % pathToFile)
+    return jsonFile
+
+
+def Purchase_Seat(Seating):           
+    
+    MaskFee = 5
+    TaxRate = 0.0725
+
+    state = True
+    while state == True:
+        seatCount = input ("Number of seats desired:  ")
+        if not seatCount.isnumeric():
+            print ("\nInput is NOT an integar!!!\n")
+        else:
+            state = False
+
+    state = True
+    while state == True:    
         
-        print("\t" + SType + "\t\t$" + str(SPrice), end="\t")
-        print()  
+        seatPos = input  ("Starting seat (ex. 3D):  ")
+
+        rPos = int(seatPos[:-1])
+        cPos = seatPos[-1:]
+
+        SeatWanted, Distancing = Generate_Artifact (seatCount, seatPos)
+
+        if Check_Overlap (SeatWanted, Distancing):
+            print ("\nSeat selection NOT valid due to social distancing!!\n")
+        elif rPos not in ROW or cPos not in COL or ord(cPos)+int(seatCount) > 90:
+            print ("\nInput exceeds capacity!!!\n")
+        else:
+            print (str(seatCount) + " seats starting at (" + seatPos + ") are available for purchase" )
+            state = False
+
+            name = input ("Enter your name:  ")
+            emailAddr = input ("Enter your email address:  ")
+
+            Update_Availability (SeatWanted, Distancing)
+            SType, SPrice = Determine_Pricing(rPos)
+            Seat = [x+y for x,y in SeatWanted]
+            print (Seat)
+
+            TicketCost = int(seatCount) * SPrice
+            TotalMaskFee = int(seatCount) * MaskFee
+            Subtotal = TicketCost + TotalMaskFee
+            Tax = Subtotal * TaxRate
+            Total = Subtotal + Tax
+
+            print ("\n====================================================================================================")
+            print ("                                       Receipt")
+            print ("====================================================================================================")
+            print ()
+            print (f'{"Name:":<50}', name)
+            print (f'{"Email:":<50}', emailAddr)
+            print (f'{"Number of seats:":<50}', seatCount)
+            print (f'{"Seat Type:":<50}', SType, "($" + str(SPrice) + ")")
+            print (f'{"Seats:  ":<50}', *Seat)
+            print (f'{"Ticket Cost:":<50}', "$" + f'{TicketCost:.2f}') 
+            print (f'{"Mask Fee:":<50}', "$" + f'{TotalMaskFee:.2f}') 
+            print (f'{"Subtotal":<50}', "$" + f'{Subtotal:.2f}') 
+            print (f'{"Tax:":<50}', "$" + f'{Tax:.2f}') 
+            print ("----------------------------------------------------------------------------------------------------")
+            print (f'{"Total:":<50}', "$" + f'{Total:.2f}') 
+            print ("====================================================================================================\n\n")
+            return Seating
 
 
 def Search_By_Customer (Seating):
@@ -170,89 +224,41 @@ def Search_By_Customer (Seating):
     print ()
 
 
-def Determine_Pricing (r):
+def Update_Availability (SeatWanted, Distancing):
 
-    FrontSeatPrice = 80
-    MiddleSeatPrice = 50
-    BackSeatPrice = 25
-
-    MiddleSeatLowerBoundary = 5
-    BackSeatLowerBoundary = 11
-
-    if r < MiddleSeatLowerBoundary:
-        SType = "Front"
-        SPrice = FrontSeatPrice
-    elif r < BackSeatLowerBoundary:
-        SType = "Middle"
-        SPrice = MiddleSeatPrice
-    else:
-        SType = "Back"
-        SPrice = BackSeatPrice
-    return (SType, SPrice)
+    for r, c in Distancing:   
+        Seating[r][c]["Availability"]=blocked_seat
+            
+    for r, c in SeatWanted:
+        Seating[r][c]["Availability"]=reserved_seat 
+            
+    return (Seating)
 
 
-def Purchase_Seat(Seating):           
+def View_Seating (Seating): 
+
+    # print available seating
+    print ("\n=====================================================================================")
+    print ("                                       Seating")
+    print ("=====================================================================================")
+    print ()
     
-    MaskFee = 5
-    TaxRate = 0.0725
+    print ("\t", end="")
+    for c in COL:
+        print (c, end=" ")
+    print ("\tType\t\tPrice")
+    print ("\t" + "-" * 52 + "\t" + "-" * 6 + "\t\t" + "-" * 5)
 
-    state = True
-    while state == True:
-        seatCount = input ("Number of seats desired:  ")
-        if not seatCount.isnumeric():
-            print ("\nInput is NOT an integar!!!\n")
-        else:
-            state = False
+    for r in ROW:
+        print(r, end="\t")
+        for c in COL:
+            print(Seating[str(r)][c]["Availability"], end=" ") 
 
-    state = True
-    while state == True:    
+        SType, SPrice = Determine_Pricing(r)
         
-        seatPos = input  ("Starting seat (ex. 3D):  ")
+        print("\t" + SType + "\t\t$" + str(SPrice), end="\t")
+        print()  
 
-        rPos = int(seatPos[:-1])
-        cPos = seatPos[-1:]
-
-        PotentialPurchase, Distancing = Generate_Artifact (seatCount, seatPos)
-
-        if Check_Overlap (PotentialPurchase, Distancing):
-            print ("\nSeat selection NOT valid!!\n")
-        elif rPos not in ROW or cPos not in COL or ord(cPos)+int(seatCount) > 90:
-            print ("\nInput exceeds capacity!!!\n")
-        else:
-            print (str(seatCount) + " seats starting at (" + seatPos + ") are available for purchase" )
-            state = False
-
-            name = input ("Enter your name:  ")
-            emailAddr = input ("Enter your email address:  ")
-
-            Update_Availability (PotentialPurchase, Distancing)
-            SType, SPrice = Determine_Pricing(rPos)
-            Seat = [x+y for x,y in PotentialPurchase]
-            print (Seat)
-
-            TicketCost = int(seatCount) * SPrice
-            TotalMaskFee = int(seatCount) * MaskFee
-            Subtotal = TicketCost + TotalMaskFee
-            Tax = Subtotal * TaxRate
-            Total = Subtotal + Tax
-
-            print ("\n=====================================================================================")
-            print ("                                       Receipt")
-            print ("=====================================================================================")
-            print ()
-            print (f'{"Name:":<50}', name)
-            print (f'{"Email:":<50}', emailAddr)
-            print (f'{"Number of seats:":<50}', seatCount)
-            print (f'{"Seat Type:":<50}', SType, "($" + str(SPrice) + ")")
-            print (f'{"Seats:  ":<50}', *Seat)
-            print (f'{"Ticket Cost:":<50}', "$" + f'{TicketCost:.2f}') 
-            print (f'{"Mask Fee:":<50}', "$" + f'{TotalMaskFee:.2f}') 
-            print (f'{"Subtotal":<50}', "$" + f'{Subtotal:.2f}') 
-            print (f'{"Tax:":<50}', "$" + f'{Tax:.2f}') 
-            print ("-------------------------------------------------------------------------------------")
-            print (f'{"Total:":<50}', "$" + f'{Total:.2f}') 
-            print ("=====================================================================================\n\n")
-            return Seating
 
 if __name__ == '__main__':
 
@@ -261,6 +267,9 @@ if __name__ == '__main__':
     
     ROW = range(20)
     COL = string.ascii_uppercase
+
+    reserved_seat = "R"
+    blocked_seat = "x"
 
     Seating = Initialize_Env ()
 

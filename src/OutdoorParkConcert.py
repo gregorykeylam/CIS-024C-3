@@ -26,9 +26,8 @@ def  Purchase_Seat(Seating):
         seatPos = input  ("Starting seat (ex. 3D):  ")
         rPos = int(seatPos[:-1])
         cPos = seatPos[-1:]
-
         if rPos not in ROW or cPos not in COL or ord(cPos)+int(seatCount) > 90:
-            print ("\nInput exceeds current capacity!!!\n")
+            print ("\nInput exceeds capacity!!!\n")
         else:
             state = False
 
@@ -36,7 +35,6 @@ def  Purchase_Seat(Seating):
     emailAddr = input ("Enter your email address:  ")
     
     Seating, Seat = Update_Availability (seatCount, seatPos, name, Seating)
-    
     SType, SPrice = Determine_Pricing(rPos)
 
     TicketCost = int(seatCount) * SPrice
@@ -166,7 +164,6 @@ def View_Seating (Seating):
     for c in COL:
         print (c, end=" ")
     print ("\tType\t\tPrice")
-
     print ("\t" + "-" * 52 + "\t" + "-" * 6 + "\t\t" + "-" * 5)
 
     for r in ROW:

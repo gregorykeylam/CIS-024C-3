@@ -26,7 +26,7 @@ def  Purchase_Seat(Seating):
         seatPos = input  ("Starting seat (ex. 3D):  ")
         rPos = int(seatPos[:-1])
         cPos = seatPos[-1:]
-        print ("rPos->" + str(rPos) + ":" + "cPos->" + cPos)
+
         if rPos not in ROW or cPos not in COL or ord(cPos)+int(seatCount) > 90:
             print ("\nInput exceeds current capacity!!!\n")
         else:
@@ -50,17 +50,17 @@ def  Purchase_Seat(Seating):
     print ("=====================================================================================")
     print ()
 
-    print (f'{"Name:":<45}', name)
-    print (f'{"Email:":<45}', emailAddr)
-    print (f'{"Number of seats:":<45}', seatCount, seatCount)
-    print (f'{"Seat Type:":<45}', SType + " ($" + str(SPrice) + ")")
-    print (f'{"Seats:  ":<45}', *Seat)
-    print (f'{"Ticket Cost:":<45}', "$" + f'{TicketCost:.2f}') 
-    print (f'{"Mask Fee:":<45}', "$" + f'{TotalMaskFee:.2f}') 
-    print (f'{"Subtotal":<45}', "$" + f'{Subtotal:.2f}') 
-    print (f'{"Tax:":<45}', "$" + f'{Tax:.2f}') 
+    print (f'{"Name:":<50}', name)
+    print (f'{"Email:":<50}', emailAddr)
+    print (f'{"Number of seats:":<50}', seatCount)
+    print (f'{"Seat Type:":<50}', SType, "($" + str(SPrice) + ")")
+    print (f'{"Seats:  ":<50}', *Seat)
+    print (f'{"Ticket Cost:":<50}', "$" + f'{TicketCost:.2f}') 
+    print (f'{"Mask Fee:":<50}', "$" + f'{TotalMaskFee:.2f}') 
+    print (f'{"Subtotal":<50}', "$" + f'{Subtotal:.2f}') 
+    print (f'{"Tax:":<50}', "$" + f'{Tax:.2f}') 
     print ("-------------------------------------------------------------------------------------")
-    print (f'{"Total:":<45}', "$" + f'{Total:.2f}') 
+    print (f'{"Total:":<50}', "$" + f'{Total:.2f}') 
     print ("=====================================================================================\n\n")
     return Seating
 
@@ -68,10 +68,6 @@ def Update_Availability (seatCount, seatPos, name, Seating):
 
     rPos = seatPos[:-1]
     cPos = seatPos[-1:]
-    #xPos = chr(ord(cPos) + int(seatCount))
-    #print (xPos)
-    #print ("rPos->" + rPos + ":" + "cPos->" + cPos)
-    #print ("rPos->", ord(cPos) ,  ":" + "xPos->" , xPos)
    
     Seat = []
     for x in range(ord(cPos), ord(cPos)+int(seatCount)):
@@ -96,18 +92,15 @@ def Update_Availability (seatCount, seatPos, name, Seating):
         Seating[rPos][chr(z)]["Availability"] = "x"
 
 
-    #for i in range(ord(cPos)-2, ord(cPos)+int(seatCount)+2):
     if int(rPos)+1 < 19:
         for i in range(Left, Right):
             Seating[str(int(rPos)+1)][chr(i)]["Availability"] = "x"
 
-    #for j in range(ord(cPos)-2, ord(cPos)+int(seatCount)+2):
     if int(rPos)-1 > 0:
         for j in range(Left, Right):
             Seating[str(int(rPos)-1)][chr(j)]["Availability"] = "x"
 
     print (str(seatCount) + " seats starting at (" + seatPos + ") are available for purchase" )
-    #print (Seating)
     return (Seating, Seat)
 
 def Determine_Pricing (r):
@@ -157,7 +150,6 @@ def Initialize_Env ():
             for c in COL:
                 Seating[str(r)][c] = {}
                 Seating[str(r)][c]["Availability"] = available_seat
-                #1Seating[str(r)][c]["Name"] = str(r) + str(c)
                 
     return Seating
 
@@ -189,6 +181,7 @@ def View_Seating (Seating):
 
 
 def Search_By_Customer (Seating):
+    
     #print (Seating.get("2",{}))
     #print (Seating.get("2",{}).get("D",{}))
     #print (Seating.get("2",{}).get("D",{}).get("ReservedBy"))
@@ -235,14 +228,9 @@ def Display_All_Purchases (Seating):
 
     print ("\nFollowning seats have been sold:\n")
     print (*Purchases)
-    #print ("\n\"" + SearchName + "\" has purchased the following seat(s):\n")
     print ()
-    #print (TypeCount)
     print ("Transactions above (" + str(sType.count("Front")) + " Front, " + str(sType.count("Middle")) + \
     " Middle & " + str(sType.count("Back")) + " Back) have generated $" + f'{Amount:.2f}' + " of income")
-    #print (sType.count("Middle"))
-    #print (sType.count("Back"))
-    #print (Amount)
     print ()
     print ()
 

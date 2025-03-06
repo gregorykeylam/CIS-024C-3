@@ -274,8 +274,8 @@ def View_Seating (seating):
     print ("\t", end="")
     for c in COL:
         print (c, end=" ")
-    print ("\tType\tPrice")
-    print ("\t" + "-" * 52 + "\t" + "-" * 6 + "\t" + "-" * 5)
+    print ("\tType\t\tPrice")
+    print ("\t" + "-" * 52 + "\t" + "-" * 6 + "\t\t" + "-" * 5)
     
     # Print current seating chart
     for r in ROW:
@@ -285,7 +285,7 @@ def View_Seating (seating):
 
         # print type & price for each row
         sType, sPrice = Determine_Pricing(r)
-        print(f'\t{sType}\t${sPrice}', end="\t")
+        print(f'\t{sType}\t\t${sPrice}', end="\t")
         print()  
 
 

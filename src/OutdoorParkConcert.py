@@ -155,7 +155,7 @@ def Purchase_Seat(seating):
     state = True
     while state == True:
         seatCount = input ("Number of seats desired:  ")
-        if not seatCount.isnumeric():
+        if not isinstance (seatCount, int):
             print ("\nInput is NOT an integar!!!\n")
         else:
             state = False

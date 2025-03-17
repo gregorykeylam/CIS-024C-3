@@ -61,7 +61,7 @@ def display_all_purchases ():
                 amount += sprice
 
     # Display all purchases and the total amount made
-    print ("\nFollowning seats have been sold:\n")
+    print ("\nFollowing seats have been sold:\n")
     for i in range(0, len(transactions), 15):
         print(*transactions[i:i+15],"\n" )
     print ()

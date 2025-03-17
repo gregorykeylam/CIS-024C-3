@@ -76,7 +76,7 @@ def generate_artifact (seat_count, seat_pos):
     Determine which seats need to be reserved or blocked for the transaction
 
     """
-    # Seperate seat postion inputted into row and column
+    # Separate seat position inputted into row and column
     rpos = seat_pos[:-1]
     cpos = seat_pos[-1:]
 
@@ -159,14 +159,14 @@ def purchase_seat(current_seating):
     while state:
         seat_count = input ("\nNumber of seats desired:  ")
         if not seat_count.isnumeric() or int(seat_count) < 1:
-            print ("\nInvaid input.  Requires an integer greater than 1!")
+            print ("\nInvalid input.  Requires an integer greater than 1!")
         else:
             # Ask user for starting seat and then error check the input
             seat_pos = input ("\nStarting seat (ex. 3D):  ")
             # Check if seat selection exist
             in_range = any(seat_pos in c.values() for r in seating.values() for c in r.values())
             if in_range:
-                # Seperate seat postion inputted into row and column
+                # Separate seat position inputted into row and column
                 rpos = int(seat_pos[:-1])
                 cpos = seat_pos[-1:]
 
@@ -348,7 +348,7 @@ if __name__ == '__main__':
         print ("[Q/q]     Quit app")
         print ("\n")
 
-        # Ask user for input on what task to perform.
+        # Ask the user for input on what task to perform.
         # Trigger different action based on input
         Command = input ("Enter a command:  ")
         match Command.lower():

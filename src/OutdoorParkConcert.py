@@ -13,8 +13,8 @@ import os
 
 
 def determine_pricing(rpos):
-    """  
-    Determine seat type and price based on row position  
+    """
+    Determine seat type and price based on row position
     """
     # Set seat prices
     front_seat_price = 80
@@ -39,13 +39,17 @@ def determine_pricing(rpos):
 
 
 def display_all_purchases():
-    """  
+    """
     Determine which seats are sold and calculate the total the venue has made
     """
     # Print header
-    print("\n=====================================================================================")
+    print(
+        "\n====================================================================================="
+    )
     print("                                   Purchase History")
-    print("=====================================================================================")
+    print(
+        "====================================================================================="
+    )
     print()
 
     amount = 0
@@ -63,10 +67,12 @@ def display_all_purchases():
     # Display all purchases and the total amount made
     print("\nFollowing seats have been sold:\n")
     for i in range(0, len(transactions), 15):
-        print(*transactions[i:i+15], "\n")
+        print(*transactions[i : i + 15], "\n")
     print()
-    print(f"Transactions above ({result.count("Front")} Front, {result.count("Middle")} Middle "
-          f"& {result.count("Back")} Back) have generated ${amount:.2f} of income")
+    print(
+        f"Transactions above ({result.count("Front")} Front, {result.count("Middle")} Middle "
+        f"& {result.count("Back")} Back) have generated ${amount:.2f} of income"
+    )
     print()
     print()
 
@@ -92,32 +98,32 @@ def generate_artifact(seat_count, seat_pos):
     #   * Bulk tickets that are purchased can sit next to each other.
 
     # Determine which seats to block to the left of the selected seats
-    if ord(cpos)-2 < ascii_A:
+    if ord(cpos) - 2 < ascii_A:
         left = ascii_A
     else:
-        left = ord(cpos)-2
+        left = ord(cpos) - 2
     for item in range(left, ord(cpos)):
         social_distancing.append([rpos, chr(item)])
 
     # Determine which seats to block to the right of the selected seats
-    if ord(cpos)+int(seat_count)+2 > ascii_Z:
+    if ord(cpos) + int(seat_count) + 2 > ascii_Z:
         right = ascii_Z + 1
     else:
-        right = ord(cpos)+int(seat_count)+2
-    for item in range(ord(cpos)+int(seat_count), right):
+        right = ord(cpos) + int(seat_count) + 2
+    for item in range(ord(cpos) + int(seat_count), right):
         social_distancing.append([rpos, chr(item)])
 
     # Determine which seats to block behind the selected seats
-    if int(rpos)+1 < 19:
+    if int(rpos) + 1 < 19:
         for item in range(left, right):
-            social_distancing.append([str(int(rpos)+1), chr(item)])
+            social_distancing.append([str(int(rpos) + 1), chr(item)])
 
     # Determine which seats to block in front of the selected seats
-    if int(rpos)-1 > 0:
+    if int(rpos) - 1 > 0:
         for item in range(left, right):
-            social_distancing.append([str(int(rpos)-1), chr(item)])
+            social_distancing.append([str(int(rpos) - 1), chr(item)])
     # Determine which seats are to be reserved
-    for item in range(ord(cpos), ord(cpos)+int(seat_count)):
+    for item in range(ord(cpos), ord(cpos) + int(seat_count)):
         seat_wanted.append([str(rpos), chr(item)])
 
     return (seat_wanted, social_distancing)
@@ -139,7 +145,7 @@ def initialize_env():
             for c in COL:
                 current_seating[str(r)][c] = {}
                 current_seating[str(r)][c]["Availability"] = AVAILABLE_SEAT
-                current_seating[str(r)][c]["Position"] = str(r)+c
+                current_seating[str(r)][c]["Position"] = str(r) + c
     return current_seating
 
 
@@ -148,7 +154,7 @@ def open_file(path, mode):
     Try to open the json file and throw an error if it can't
     """
     try:
-        file = open(path, mode, encoding='UTF-8')
+        file = open(path, mode, encoding="UTF-8")
     except OSError:
         print(f'ERROR: Unable to open the file "{path}"')
     return file
@@ -168,42 +174,44 @@ def purchase_seat(current_seating):
             # Ask user for starting seat and then error check the input
             seat_pos = input("\nStarting seat (ex. 3D):  ")
             # Check if seat selection exist
-            in_range = any(seat_pos in c.values()
-                           for r in seating.values() for c in r.values())
+            in_range = any(
+                seat_pos in c.values() for r in seating.values() for c in r.values()
+            )
             if in_range:
                 # Separate seat position inputted into row and column
                 rpos = int(seat_pos[:-1])
                 cpos = seat_pos[-1:]
 
                 # Find out all seats involved in this transaction
-                seat_wanted, social_distancing = generate_artifact(
-                    seat_count, seat_pos)
+                seat_wanted, social_distancing = generate_artifact(seat_count, seat_pos)
 
                 # Determine if number of seats wanted exceed capacity
-                exceed_capacity = True if ord(
-                    cpos) + int(seat_count) - 1 > 90 else False
+                exceed_capacity = (
+                    True if ord(cpos) + int(seat_count) - 1 > 90 else False
+                )
 
             if not in_range or exceed_capacity:
                 print("\nSeat selection not valid or seat count exceeds capacity!")
             elif violate_restrictions(seat_wanted, social_distancing):
                 print(
-                    "\nSelection not accepted due to social distancing or previous reservation!")
+                    "\nSelection not accepted due to social distancing or previous reservation!"
+                )
             else:
                 # If purchase is allowed to proceed, inform user and ask for name and email
                 print(
-                    f'\n{seat_count} seat(s) starting at {seat_pos} are available for purchase\n')
+                    f"\n{seat_count} seat(s) starting at {seat_pos} are available for purchase\n"
+                )
                 state = False
 
                 name = input("Enter your name:  ")
                 email_addr = input("Enter your email address:  ")
 
                 # Update seating chart
-                update_availability(
-                    seat_wanted, social_distancing, name, email_addr)
+                update_availability(seat_wanted, social_distancing, name, email_addr)
 
                 # Calculate items needed for the receipt
                 stype, sprice = determine_pricing(rpos)
-                seat_purchased = [r+c for r, c in seat_wanted]
+                seat_purchased = [r + c for r, c in seat_wanted]
                 ticket_cost = int(seat_count) * sprice
                 total_mask_fee = int(seat_count) * MASK_FEE
                 subtotal = ticket_cost + total_mask_fee
@@ -213,29 +221,31 @@ def purchase_seat(current_seating):
                 # Display the receipt
                 left_justified = 50
                 print(
-                    "\n====================================================================================================")
+                    "\n===================================================================================================="
+                )
                 print("                                       Receipt")
                 print(
-                    "====================================================================================================")
+                    "===================================================================================================="
+                )
                 print()
                 print(f'{"Name:":<{left_justified}}', name)
                 print(f'{"Email:":<{left_justified}}', email_addr)
                 print(f'{"Number of seats:":<{left_justified}}', seat_count)
-                print(f'{"Seat Type:":<{left_justified}}',
-                      stype, "($" + str(sprice) + ")")
+                print(
+                    f'{"Seat Type:":<{left_justified}}', stype, "($" + str(sprice) + ")"
+                )
                 print(f'{"Seats:  ":<{left_justified}}', *seat_purchased)
-                print(f'{"Ticket Cost:":<{left_justified}}',
-                      "$" + f'{ticket_cost:.2f}')
-                print(f'{"Mask Fee:":<{left_justified}}',
-                      "$" + f'{total_mask_fee:.2f}')
-                print(f'{"Subtotal":<{left_justified}}',
-                      "$" + f'{subtotal:.2f}')
-                print(f'{"Tax:":<{left_justified}}', "$" + f'{tax:.2f}')
+                print(f'{"Ticket Cost:":<{left_justified}}', "$" + f"{ticket_cost:.2f}")
+                print(f'{"Mask Fee:":<{left_justified}}', "$" + f"{total_mask_fee:.2f}")
+                print(f'{"Subtotal":<{left_justified}}', "$" + f"{subtotal:.2f}")
+                print(f'{"Tax:":<{left_justified}}', "$" + f"{tax:.2f}")
                 print(
-                    "----------------------------------------------------------------------------------------------------")
-                print(f'{"Total:":<{left_justified}}', "$" + f'{total:.2f}')
+                    "----------------------------------------------------------------------------------------------------"
+                )
+                print(f'{"Total:":<{left_justified}}', "$" + f"{total:.2f}")
                 print(
-                    "====================================================================================================\n\n")
+                    "====================================================================================================\n\n"
+                )
                 return current_seating
 
 
@@ -247,9 +257,13 @@ def search_by_customer(current_seating):
     search_name = input("Enter customer's name to be searched:  ")
 
     # Print header
-    print("\n=====================================================================================")
+    print(
+        "\n====================================================================================="
+    )
     print("                                   Search Result")
-    print("=====================================================================================")
+    print(
+        "====================================================================================="
+    )
     print()
 
     # Search seat purchased by inputted name
@@ -292,17 +306,27 @@ def view_seating(current_seating):
     Display the current seating chart
     """
     # Print header
-    print("\n=====================================================================================")
+    print(
+        "\n====================================================================================="
+    )
     print("                                       Seating")
-    print("=====================================================================================")
+    print(
+        "====================================================================================="
+    )
     print()
     # Print sub header
     print("\t", end="")
     for c in COL:
         print(c, end=" ")
     print("\tType\t\tPrice")
-    print("\t" + "---------------------------------------------------" +
-          "\t" + "------" + "\t\t" + "------")
+    print(
+        "\t"
+        + "---------------------------------------------------"
+        + "\t"
+        + "------"
+        + "\t\t"
+        + "------"
+    )
     # Print current seating chart
     for r in ROW:
         print(r, end="\t")
@@ -311,7 +335,7 @@ def view_seating(current_seating):
 
         # print type & price for each row
         stype, sprice = determine_pricing(r)
-        print(f'\t{stype}\t\t${sprice}', end="\t")
+        print(f"\t{stype}\t\t${sprice}", end="\t")
         print()
 
 
@@ -330,7 +354,7 @@ def violate_restrictions(seat_wanted, social_distancing):
     return any(item in reserved for item in social_distancing + seat_wanted)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     # Relative path to the data file
     PATH_TO_FILE = "../misc/OutdoorParkConcert.json"
@@ -342,7 +366,7 @@ if __name__ == '__main__':
     # Set symbol or letter for each representation
     RESERVED_SEAT = "R"
     BLOCKED_SEAT = "x"
-    AVAILABLE_SEAT = '.'
+    AVAILABLE_SEAT = "."
 
     # Set other pertinent information
     MASK_FEE = 5
@@ -354,9 +378,13 @@ if __name__ == '__main__':
     while True:
 
         # Print header
-        print("=====================================================================================")
+        print(
+            "====================================================================================="
+        )
         print("                              Outdoor Park Concert App")
-        print("=====================================================================================")
+        print(
+            "====================================================================================="
+        )
         print()
 
         # Print menu
